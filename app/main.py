@@ -1,7 +1,27 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from app.db.database import engine,Base
 
-app = FastAPI(title="LingoLift Backend")
+app = FastAPI(
+    title="LingoLift Backend",
+    description="CAT VARC section backend",
+    version="1.0.0"
+)
 
-@app.get("/")
-def root():
-    return{"message":"Welcome to the LingoLift Backend"}
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Startup pe DB connection check
+@app.on_event("startup")
+async def startup():
+    async with engine.begin() as conn:
+        print("✅ Database connected successfully!")
+
+@app.get("/health")
+async def health_check():
+    return {"status": "ok", "message": "LingoLift API is running!"}
