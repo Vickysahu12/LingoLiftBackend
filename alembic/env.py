@@ -16,6 +16,9 @@ config.set_main_option("sqlalchemy.url", settings.DATABASE_URL)
 # Jaise jaise models banayenge, yahan add karte jayenge
 # from app.models.user import User
 
+from app.account.models import User  # ← zaroori hai
+
+
 target_metadata = Base.metadata
 
 def run_migrations_offline():
