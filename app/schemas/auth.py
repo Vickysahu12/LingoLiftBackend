@@ -1,36 +1,41 @@
-from pydantic import BaseModel,EmailStr
+from pydantic import BaseModel, EmailStr
 from typing import Optional
 import uuid
 
-# Register
 class RegisterRequest(BaseModel):
-    name:str
-    phone:str
-    email:EmailStr
-    password:str
+    name: str
+    phone: str
+    email: EmailStr
+    password: str
 
-# Login
 class LoginRequest(BaseModel):
-    email:EmailStr
-    password:str
+    email: EmailStr
+    password: str
 
-# Google Auth
-class GoogleAuthRequest():
-    id_token:str
+class GoogleAuthRequest(BaseModel):
+    id_token: str
 
-class AuthResponse():
-    access_token:str
-    token_type:str = "bearer"
-    user:"UserResponse"
+# OTP ke liye ← YE 2 ADD KARO
+class VerifyOTPRequest(BaseModel):
+    email: EmailStr
+    otp: str
 
-class UserResponse():
-    id:uuid.UUID
-    name:str
-    email:str
-    phone:Optional[str]
-    profile_pic:Optional[str]
-    is_admin:bool
-    auth_provider:str
+class ResendOTPRequest(BaseModel):
+    email: EmailStr
 
-    class config:
-        from_attributes=True
+class UserResponse(BaseModel):
+    id: uuid.UUID
+    name: str
+    email: str
+    phone: Optional[str] = None
+    profile_pic: Optional[str] = None
+    is_admin: bool
+    is_verified: bool          # ← YE BHI ADD KARO
+    auth_provider: str
+
+    model_config = {"from_attributes": True}
+
+class AuthResponse(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
+    user: UserResponse

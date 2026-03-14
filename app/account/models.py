@@ -17,13 +17,18 @@ class User(Base):
     email = Column(String(255), unique=True, nullable=False, index=True)
     name = Column(String(255), nullable=False)
     phone = Column(String(15), unique=True, nullable=True)
-    hashed_password = Column(Text, nullable=True)  # Google users ka null hoga
+    hashed_password = Column(Text, nullable=True)
     profile_pic = Column(Text, nullable=True)
 
     # App fields
     is_active = Column(Boolean, default=True)
     is_admin = Column(Boolean, default=False)
-    auth_provider = Column(String(20), default="email")  # 'email' | 'google'
+    auth_provider = Column(String(20), default="email")
+
+    # Email Verification ← YE 3 FIELDS ADD KARO
+    is_verified = Column(Boolean, default=False)
+    otp_code = Column(String(6), nullable=True)
+    otp_expires_at = Column(DateTime(timezone=True), nullable=True)
 
     # Timestamps
     created_at = Column(DateTime(timezone=True), server_default=func.now())
