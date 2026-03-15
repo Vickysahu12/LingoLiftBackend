@@ -16,7 +16,9 @@ config.set_main_option("sqlalchemy.url", settings.DATABASE_URL)
 # Jaise jaise models banayenge, yahan add karte jayenge
 # from app.models.user import User
 
-from app.account.models import User  # ← zaroori hai
+from app.account.models import User
+from app.models.vocab import VocabWord, VocabProgress, VocabBookmark
+from app.models.daily_stats import UserDailyStats, UserStreak
 
 
 target_metadata = Base.metadata
