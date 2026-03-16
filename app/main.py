@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.db.database import engine,Base
-from app.routers import auth,Vocabss,Home
+from app.routers import auth,Vocabss,Home,rc,article,va
 
 app = FastAPI(
     title="LingoLift Backend",
@@ -20,6 +20,9 @@ app.add_middleware(
 app.include_router(auth.router)
 app.include_router(Vocabss.router)
 app.include_router(Home.router)
+app.include_router(rc.router)
+app.include_router(article.router)
+app.include_router(va.router)
 
 # Startup pe DB connection check
 @app.on_event("startup")

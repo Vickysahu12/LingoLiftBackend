@@ -19,6 +19,10 @@ config.set_main_option("sqlalchemy.url", settings.DATABASE_URL)
 from app.account.models import User
 from app.models.vocab import VocabWord, VocabProgress, VocabBookmark
 from app.models.daily_stats import UserDailyStats, UserStreak
+from app.models.rc import RCPassage, RCQuestion, RCOption, RCAttempt, RCAttemptAnswer  
+from app.models.article import Article, ArticleAnalysis, ArticleBookmark, ArticleProgress
+from app.models.va import VAQuestion, VAAttempt, VAProgress   
+
 
 
 target_metadata = Base.metadata
