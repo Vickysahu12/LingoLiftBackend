@@ -22,6 +22,7 @@ from app.models.daily_stats import UserDailyStats, UserStreak
 from app.models.rc import RCPassage, RCQuestion, RCOption, RCAttempt, RCAttemptAnswer  
 from app.models.article import Article, ArticleAnalysis, ArticleBookmark, ArticleProgress
 from app.models.va import VAQuestion, VAAttempt, VAProgress   
+from app.models.notification import Notification  
 
 
 
