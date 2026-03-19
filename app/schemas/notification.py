@@ -11,7 +11,7 @@ class NotificationResponse(BaseModel):
     desc:          str
     action_screen: Optional[str] = None
     is_read:       bool
-    time:          str  # "10 min ago" format
+    time:          str  
     model_config   = {"from_attributes": True}
 
 class NotificationListResponse(BaseModel):

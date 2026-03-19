@@ -15,3 +15,4 @@ alembic upgrade head
 
 # 3. Agar galti ho — rollback
 alembic downgrade -1
+
