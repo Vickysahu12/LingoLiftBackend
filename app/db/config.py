@@ -6,7 +6,10 @@ class Settings(BaseSettings):
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 10080
     GOOGLE_CLIENT_ID: str = ""
+    GOOGLE_CLIENT_SECRET: str= ""
     RESEND_API_KEY: str # For sending Email 
+    GMAIL_USER: str = ""
+    GMAIL_PASSWORD: str = ""
 
     class Config:
         env_file = ".env"
