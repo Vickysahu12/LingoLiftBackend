@@ -15,6 +15,9 @@ class VAQuestion(Base):
     question     = Column(Text, nullable=False)
     options      = Column(JSON, default=[])
     # [{"id": "A", "text": "...", "highlight": null}]
+
+    sentences = Column(JSON, nullable=True)
+
     
     correct      = Column(String(5), nullable=False)  # "A", "B", "C", "D"
     explanation  = Column(JSON, nullable=True)

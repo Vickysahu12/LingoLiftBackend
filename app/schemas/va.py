@@ -9,6 +9,7 @@ class VAQuestionResponse(BaseModel):
     options:       List[dict] = []
     strategy:      Optional[dict] = None
     difficulty:    str
+    sentences:     Optional[List[dict]] = None  # ← ye add karo
     model_config   = {"from_attributes": True}
 
 class VASubmitRequest(BaseModel):
@@ -51,6 +52,7 @@ class VAQuestionCreate(BaseModel):
     options:       List[VAOptionCreate]
     correct:       str      # "A", "B", "C", "D"
     explanation:   dict     # {"correct": "A", "why": "..."}
+    sentences: Optional[List[dict]] = None  # ← ye add karo
     strategy:      Optional[dict] = None
     difficulty:    str = "Medium"
     order_index:   int = 0

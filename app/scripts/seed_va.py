@@ -3,25 +3,31 @@ import sys
 sys.path.insert(0, r"D:\Verbify\backend")
 
 from app.db.database import AsyncSessionLocal
-from app.account.models import User
-from app.models.va import VAQuestion, VAAttempt, VAProgress
+from app.models.va import VAQuestion
+from app.account.models import User          # ← ADD KARO
 from sqlalchemy import select
 
 VA_QUESTIONS = [
-    # ─── Para Jumble ──────────────────────────────────────────
+    # Para Jumble
     {
         "question_type": "para_jumble",
         "question": "Arrange the sentences to form a coherent paragraph.",
+        "sentences": [
+            {"label": "A", "text": "Governments across the world are now investing heavily in renewable energy infrastructure."},
+            {"label": "B", "text": "The primary driver of this shift is the urgent need to reduce carbon emissions."},
+            {"label": "C", "text": "However, the transition is not without its economic and political challenges."},
+            {"label": "D", "text": "Despite these hurdles, most experts agree that clean energy is the only viable long-term solution."},
+        ],
         "options": [
             {"id": "A", "text": "BDCA"},
-            {"id": "B", "text": "ABDC"},
+            {"id": "B", "text": "ABCD"},
             {"id": "C", "text": "DBCA"},
             {"id": "D", "text": "BDAC"},
         ],
-        "correct": "A",
+        "correct": "B",
         "explanation": {
-            "correct": "A",
-            "why": "B introduces the topic, D adds supporting evidence, C provides contrast with 'However', and A concludes with implications."
+            "correct": "B",
+            "why": "A introduces the topic broadly, B gives the reason behind the shift, C adds contrast with 'However', and D concludes despite challenges. ABCD is the correct order."
         },
         "strategy": {"icon": "🔍", "label": "Opening Sentence Strategy"},
         "difficulty": "Medium",
@@ -30,6 +36,12 @@ VA_QUESTIONS = [
     {
         "question_type": "para_jumble",
         "question": "Choose the correct order of sentences A, B, C, D to make a meaningful paragraph.",
+        "sentences": [
+            {"label": "A", "text": "This has led several nations to reconsider their foreign policy priorities."},
+            {"label": "B", "text": "As a result, multilateral institutions are struggling to maintain relevance."},
+            {"label": "C", "text": "The post-Cold War international order was built on cooperation and shared norms."},
+            {"label": "D", "text": "In recent years, however, rising nationalism has eroded this consensus."},
+        ],
         "options": [
             {"id": "A", "text": "CABD"},
             {"id": "B", "text": "ABCD"},
@@ -39,16 +51,16 @@ VA_QUESTIONS = [
         "correct": "C",
         "explanation": {
             "correct": "C",
-            "why": "C sets the broad context, D narrows it down, A provides an example, and B concludes with a result."
+            "why": "C sets the historical context, D introduces contrast with 'however', A shows the consequence, and B provides the final outcome. CDAB is the logical flow."
         },
         "strategy": {"icon": "🔗", "label": "Transition Word Strategy"},
         "difficulty": "Hard",
         "order_index": 2
     },
-    # ─── Odd One Out ──────────────────────────────────────────
+    # Odd One Out
     {
         "question_type": "odd_one_out",
-        "question": "Five sentences are given. Four form a coherent paragraph. Identify the odd sentence.",
+        "question": "Four sentences are given. Three form a coherent group. Identify the odd sentence.",
         "options": [
             {"id": "A", "text": "Globalization has accelerated the flow of capital across borders."},
             {"id": "B", "text": "Digital currencies are reshaping payment infrastructure globally."},
@@ -82,7 +94,7 @@ VA_QUESTIONS = [
         "difficulty": "Easy",
         "order_index": 2
     },
-    # ─── Para Summary ─────────────────────────────────────────
+    # Para Summary
     {
         "question_type": "para_summary",
         "question": "The rise of artificial intelligence has prompted widespread debate about the future of employment. While optimists argue that AI will create new categories of jobs, skeptics warn of mass displacement. Historical precedents suggest that technological revolutions do disrupt labor markets, but societies eventually adapt. The net outcome depends heavily on policy responses and educational investments.",
@@ -95,7 +107,7 @@ VA_QUESTIONS = [
         "correct": "B",
         "explanation": {
             "correct": "B",
-            "why": "B correctly captures the balanced perspective — acknowledging the debate, historical context, and the role of policy. Other options are either too extreme or partially correct."
+            "why": "B correctly captures the balanced perspective acknowledging the debate, historical context, and the role of policy. Other options are either too extreme or partially correct."
         },
         "strategy": {"icon": "📝", "label": "Central Idea Strategy"},
         "difficulty": "Medium",
@@ -113,13 +125,14 @@ VA_QUESTIONS = [
         "correct": "C",
         "explanation": {
             "correct": "C",
-            "why": "C best summarizes the passage — it identifies multiple threats (populism, judicial erosion, media) and the solution (civic participation). Others are either too narrow or distort the meaning."
+            "why": "C best summarizes the passage identifying multiple threats and the solution of civic participation. Others are either too narrow or distort the meaning."
         },
         "strategy": {"icon": "📝", "label": "Central Idea Strategy"},
         "difficulty": "Hard",
         "order_index": 2
     },
 ]
+
 
 async def seed():
     async with AsyncSessionLocal() as db:
@@ -128,22 +141,21 @@ async def seed():
 
         for q_data in VA_QUESTIONS:
             result = await db.execute(
-                select(VAQuestion).where(
-                    VAQuestion.question == q_data["question"]
-                )
+                select(VAQuestion).where(VAQuestion.question == q_data["question"])
             )
             if result.scalar_one_or_none():
-                print(f"⏭️  Skipped: {q_data['question_type']} - {q_data['question'][:40]}...")
+                print(f"Skipped: {q_data['question_type']} - {q_data['question'][:40]}...")
                 skipped += 1
                 continue
 
             question = VAQuestion(**q_data)
             db.add(question)
             added += 1
-            print(f"✅ Added: {q_data['question_type']} - {q_data['question'][:40]}...")
+            print(f"Added: {q_data['question_type']} - {q_data['question'][:40]}...")
 
         await db.commit()
-        print(f"\n🎉 Done! Added: {added}, Skipped: {skipped}")
+        print(f"\nDone! Added: {added}, Skipped: {skipped}")
+
 
 if __name__ == "__main__":
     asyncio.run(seed())

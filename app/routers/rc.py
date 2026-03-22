@@ -3,21 +3,31 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.db.database import get_db
 from app.dependencies import get_current_user, get_admin_user
 from app.account.models import User
-from app.schemas.Rc import RCPassageCreate, RCAttemptSubmit,RCPassageResponse
+from app.schemas.Rc import RCPassageCreate, RCAttemptSubmit, RCPassageResponse
 from app.services.rc_service import rc_service
 import uuid
 
 router = APIRouter(prefix="/rc", tags=["Reading Comprehension"])
 
-# ─── User Routes ──────────────────────────────────────────
+# ─── User Routes ──────────────────────────────────────────────────────────────
+
 @router.get("/sessions")
 async def get_passages(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)
 ):
-    return await rc_service.get_passages(db)
+    # ✅ user_id pass karo — daily 2 + is_completed logic ke liye
+    return await rc_service.get_passages(current_user.id, db)
 
-@router.get("/sessions/{passage_id}",response_model=RCPassageResponse)
+@router.get("/attempted-today")
+async def get_attempted_today(
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
+    # ✅ Naya endpoint — aaj ke completed passage IDs return karta hai
+    return await rc_service.get_attempted_today(current_user.id, db)
+
+@router.get("/sessions/{passage_id}", response_model=RCPassageResponse)
 async def get_passage(
     passage_id: uuid.UUID,
     current_user: User = Depends(get_current_user),
@@ -33,7 +43,8 @@ async def submit_attempt(
 ):
     return await rc_service.submit_attempt(current_user.id, data, db)
 
-# ─── Admin Routes ─────────────────────────────────────────
+# ─── Admin Routes ─────────────────────────────────────────────────────────────
+
 @router.post("/admin/passages", dependencies=[Depends(get_admin_user)])
 async def add_passage(
     data: RCPassageCreate,

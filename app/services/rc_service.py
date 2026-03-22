@@ -1,7 +1,6 @@
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, and_
+from sqlalchemy import select, and_, func
 from fastapi import HTTPException
-from typing import List
 import uuid
 from datetime import date
 from app.models.rc import RCPassage, RCQuestion, RCOption, RCAttempt, RCAttemptAnswer
@@ -10,33 +9,78 @@ from app.schemas.Rc import RCPassageCreate, RCAttemptSubmit
 
 class RCService:
 
-    async def get_passages(self, db: AsyncSession):
-        result = await db.execute(
+    async def get_passages(self, user_id: uuid.UUID, db: AsyncSession):
+        today = date.today()
+
+        # ── Aaj ke attempted passage IDs ──────────────────────────────────
+        today_result = await db.execute(
+            select(RCAttempt.passage_id).where(
+                and_(
+                    RCAttempt.user_id == user_id,
+                    func.date(RCAttempt.completed_at) == today
+                )
+            )
+        )
+        attempted_today_ids = set(r[0] for r in today_result.all())
+
+        # ── Kabhi bhi attempted passage IDs (all time) ────────────────────
+        all_time_result = await db.execute(
+            select(RCAttempt.passage_id.distinct()).where(
+                RCAttempt.user_id == user_id
+            )
+        )
+        all_attempted_ids = set(r[0] for r in all_time_result.all())
+
+        # ── Saare active passages ─────────────────────────────────────────
+        passages_result = await db.execute(
             select(RCPassage)
             .where(RCPassage.is_active == True)
             .order_by(RCPassage.order_index)
         )
-        passages = result.scalars().all()
+        all_passages = passages_result.scalars().all()
 
+        # ── Pehle unke jo kabhi attempt nahi hue ─────────────────────────
+        unattempted = [p for p in all_passages if p.id not in all_attempted_ids]
+
+        # Agar saare complete ho gaye — cycle restart
+        pool = unattempted if unattempted else all_passages
+
+        # Har din sirf 2 passages
+        daily = pool[:2]
+
+        # ── Response ──────────────────────────────────────────────────────
         response = []
-        for p in passages:
+        for p in daily:
             q_result = await db.execute(
                 select(RCQuestion).where(RCQuestion.passage_id == p.id)
             )
             questions = q_result.scalars().all()
 
             response.append({
-                "id": p.id,
-                "title": p.title,
-                "subject": p.subject,
-                "difficulty": p.difficulty,
-                "source": p.source,
-                "total_questions": len(questions)
+                "id":              p.id,
+                "title":           p.title,
+                "subject":         p.subject,
+                "difficulty":      p.difficulty,
+                "source":          p.source,
+                "total_questions": len(questions),
+                "is_completed":    p.id in attempted_today_ids,  # ✅ aaj done ya nahi
             })
 
         return response
 
-    # ✅ IMPORTANT: YE CLASS KE ANDAR HONA CHAHIYE
+    async def get_attempted_today(self, user_id: uuid.UUID, db: AsyncSession):
+        today = date.today()
+        result = await db.execute(
+            select(RCAttempt).where(
+                and_(
+                    RCAttempt.user_id == user_id,
+                    func.date(RCAttempt.completed_at) == today
+                )
+            )
+        )
+        attempts = result.scalars().all()
+        return [{"passage_id": str(a.passage_id)} for a in attempts]
+
     async def get_passage(self, passage_id: uuid.UUID, db: AsyncSession):
         result = await db.execute(
             select(RCPassage).where(RCPassage.id == passage_id)
@@ -63,37 +107,36 @@ class RCService:
             )
             options = opt_result.scalars().all()
 
-            options_data = []
+            correct_index = 0
+            options_data  = []
 
             for idx, o in enumerate(options):
                 if o.is_correct:
                     correct_index = idx
-
                 options_data.append({
-                    "id": o.id,
+                    "id":          o.id,
                     "option_text": o.option_text,
                     "order_index": o.order_index,
                 })
 
-
             questions_data.append({
-                "id": q.id,
-                "question": q.question,
-                "difficulty": q.difficulty,
-                "analysis": q.analysis,
-                "order_index": q.order_index,
-                "correct_index":correct_index,
-                "options": options_data
+                "id":            q.id,
+                "question":      q.question,
+                "difficulty":    q.difficulty,
+                "analysis":      q.analysis,
+                "order_index":   q.order_index,
+                "correct_index": correct_index,
+                "options":       options_data
             })
 
         return {
-            "id": passage.id,
-            "title": passage.title,
-            "body": passage.body,
-            "subject": passage.subject,
+            "id":         passage.id,
+            "title":      passage.title,
+            "body":       passage.body,
+            "subject":    passage.subject,
             "difficulty": passage.difficulty,
-            "source": passage.source,
-            "questions": questions_data
+            "source":     passage.source,
+            "questions":  questions_data
         }
 
     async def submit_attempt(self, user_id: uuid.UUID, data: RCAttemptSubmit, db: AsyncSession):
@@ -127,13 +170,13 @@ class RCService:
 
         await db.flush()
 
-        # ← Daily stats update karo
+        # Daily stats update
         today = date.today()
         stats_result = await db.execute(
             select(UserDailyStats).where(
                 and_(
                     UserDailyStats.user_id == user_id,
-                    UserDailyStats.date == today
+                    UserDailyStats.date    == today
                 )
             )
         )
@@ -142,9 +185,9 @@ class RCService:
             stats.rc_passages += 1
         else:
             stats = UserDailyStats(
-                user_id=user_id,
-                date=today,
-                rc_passages=1
+                user_id     = user_id,
+                date        = today,
+                rc_passages = 1
             )
             db.add(stats)
         await db.flush()
