@@ -11,20 +11,17 @@ class VAService:
 
     # ─── Hub Stats ────────────────────────────────────────────
     async def get_hub(self, user: User, db: AsyncSession):
-        # Streak
         streak_result = await db.execute(
             select(UserStreak).where(UserStreak.user_id == user.id)
         )
         streak_obj = streak_result.scalar_one_or_none()
         streak = streak_obj.current_streak if streak_obj else 0
 
-        # Progress
         prog_result = await db.execute(
             select(VAProgress).where(VAProgress.user_id == user.id)
         )
         progress = prog_result.scalar_one_or_none()
 
-        # Per type total questions
         async def get_total(qtype):
             r = await db.execute(
                 select(func.count()).select_from(VAQuestion).where(
@@ -106,6 +103,7 @@ class VAService:
                 "question_type": q.question_type,
                 "question":      q.question,
                 "options":       q.options,
+                "sentences":     q.sentences,   # ✅ YE ADD KIYA — para_jumble ke liye
                 "strategy":      q.strategy,
                 "difficulty":    q.difficulty,
             }
@@ -114,7 +112,6 @@ class VAService:
 
     # ─── Submit Answer ────────────────────────────────────────
     async def submit_answer(self, user_id: uuid.UUID, data: VASubmitRequest, db: AsyncSession):
-        # Question fetch
         result = await db.execute(
             select(VAQuestion).where(VAQuestion.id == data.question_id)
         )
@@ -124,7 +121,6 @@ class VAService:
 
         is_correct = data.selected == question.correct
 
-        # Save attempt
         attempt = VAAttempt(
             user_id       = user_id,
             question_id   = data.question_id,
@@ -134,7 +130,6 @@ class VAService:
         )
         db.add(attempt)
 
-        # Update progress
         prog_result = await db.execute(
             select(VAProgress).where(VAProgress.user_id == user_id)
         )
@@ -144,7 +139,6 @@ class VAService:
             progress = VAProgress(user_id=user_id)
             db.add(progress)
 
-        # Per type update
         if data.question_type == "para_jumble":
             progress.pj_attempted  += 1
             if is_correct: progress.pj_correct += 1
@@ -187,15 +181,15 @@ class VAService:
         ) if progress.total_attempted > 0 else 0.0
 
         return {
-            "pj_attempted":   progress.pj_attempted,
-            "pj_correct":     progress.pj_correct,
-            "ooo_attempted":  progress.ooo_attempted,
-            "ooo_correct":    progress.ooo_correct,
-            "ps_attempted":   progress.ps_attempted,
-            "ps_correct":     progress.ps_correct,
+            "pj_attempted":    progress.pj_attempted,
+            "pj_correct":      progress.pj_correct,
+            "ooo_attempted":   progress.ooo_attempted,
+            "ooo_correct":     progress.ooo_correct,
+            "ps_attempted":    progress.ps_attempted,
+            "ps_correct":      progress.ps_correct,
             "total_attempted": progress.total_attempted,
-            "total_correct":  progress.total_correct,
-            "accuracy":       accuracy
+            "total_correct":   progress.total_correct,
+            "accuracy":        accuracy
         }
 
     # ─── Admin: Add Question ──────────────────────────────────
@@ -207,6 +201,7 @@ class VAService:
             correct       = data.correct,
             explanation   = data.explanation,
             strategy      = data.strategy,
+            sentences     = data.sentences,   # ✅ sentences bhi save hoga
             difficulty    = data.difficulty,
             order_index   = data.order_index
         )
