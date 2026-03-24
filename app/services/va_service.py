@@ -136,8 +136,14 @@ class VAService:
         progress = prog_result.scalar_one_or_none()
 
         if not progress:
-            progress = VAProgress(user_id=user_id)
-            db.add(progress)
+         progress = VAProgress(
+        user_id=user_id,
+        pj_attempted=0, pj_correct=0,
+        ooo_attempted=0, ooo_correct=0,
+        ps_attempted=0, ps_correct=0,
+        total_attempted=0, total_correct=0
+       )
+        db.add(progress) 
 
         if data.question_type == "para_jumble":
             progress.pj_attempted  += 1
