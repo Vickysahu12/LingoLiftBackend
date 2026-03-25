@@ -23,6 +23,7 @@ from app.models.rc import RCPassage, RCQuestion, RCOption, RCAttempt, RCAttemptA
 from app.models.article import Article, ArticleAnalysis, ArticleBookmark, ArticleProgress
 from app.models.va import VAQuestion, VAAttempt, VAProgress   
 from app.models.notification import Notification  
+from app.models.mock import MockType,DifficultyLevel,BadgeType,QuestionType,AttemptStatus,QuestionStatus,MockTest,MockSection,MarkingScheme,MockRule,MockSyllabus,MockInstruction,Passage,MockQuestion,TestAttempt,QuestionResponse
 
 
 
