@@ -12,6 +12,7 @@ app = FastAPI(
     version="1.0.0"
 )
 
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -31,7 +32,7 @@ app.include_router(mock_router)
 app.include_router(attempts_router)
 app.include_router(profile_router)
 
-# Startup pe DB connection check
+# Startup pe DB connection check and health check
 @app.on_event("startup")
 async def startup():
     async with engine.begin() as conn:
