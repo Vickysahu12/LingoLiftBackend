@@ -6,6 +6,7 @@ from datetime import date
 from app.models.rc import RCPassage, RCQuestion, RCOption, RCAttempt, RCAttemptAnswer
 from app.models.daily_stats import UserDailyStats
 from app.schemas.Rc import RCPassageCreate, RCAttemptSubmit
+from app.services.streak_service import update_streak
 
 class RCService:
 
@@ -170,6 +171,9 @@ class RCService:
 
         await db.flush()
 
+        
+
+
         # Daily stats update
         today = date.today()
         stats_result = await db.execute(
@@ -191,6 +195,8 @@ class RCService:
             )
             db.add(stats)
         await db.flush()
+        await update_streak(user_id=user_id, db=db) 
+
 
         return {
             "attempt_id": attempt.id,

@@ -53,6 +53,8 @@ async def track_time(
 ):
     return await article_service.track_time(current_user.id, article_id, data.seconds_spent, db)
 
+
+
 # ─── Admin Routes ─────────────────────────────────────────
 @router.post("/admin/articles", dependencies=[Depends(get_admin_user)])
 async def add_article(

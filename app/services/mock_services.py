@@ -3,6 +3,7 @@ from sqlalchemy import select, and_, func
 from fastapi import HTTPException
 import uuid
 from datetime import datetime, timezone
+from app.services.streak_service import update_streak
 
 from app.models.mock import (
     MockTest, MockSection, MarkingScheme, MockRule,
@@ -437,6 +438,8 @@ class MockService:
             "va": va_result,
         }
         await db.flush()
+        await update_streak(user_id=user_id, db=db)  # ← yahan
+
 
         return {
             "attempt_id":      attempt.id,

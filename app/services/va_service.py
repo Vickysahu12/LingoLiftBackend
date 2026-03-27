@@ -6,6 +6,7 @@ from app.models.va import VAQuestion, VAAttempt, VAProgress
 from app.models.daily_stats import UserStreak
 from app.account.models import User
 from app.schemas.va import VAQuestionCreate, VASubmitRequest
+from app.services.streak_service import update_streak
 
 class VAService:
 
@@ -159,6 +160,8 @@ class VAService:
         if is_correct: progress.total_correct += 1
 
         await db.flush()
+
+        await update_streak(user_id=user_id, db=db)  # ← yahan
 
         return {
             "is_correct":  is_correct,

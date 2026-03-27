@@ -4,6 +4,7 @@ from fastapi import HTTPException
 import uuid
 from app.models.article import Article, ArticleAnalysis, ArticleBookmark, ArticleProgress
 from app.schemas.Article import ArticleCreate, ArticleAnalysisCreate
+from app.services.streak_service import update_streak
 
 class ArticleService:
 
@@ -124,6 +125,8 @@ class ArticleService:
             db.add(progress)
 
         await db.flush()
+        await update_streak(user_id=user_id, db=db)  # ← yahan
+
         return {"success": True}
 
     # ─── Track Read Time ──────────────────────────────────────

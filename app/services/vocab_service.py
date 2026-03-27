@@ -7,6 +7,7 @@ from app.models.vocab import VocabWord, VocabProgress, VocabBookmark
 from app.account.models import User
 from app.schemas.vocabs import VocabQuizSubmit, BookmarkToggleRequest, VocabWordCreate
 import uuid
+from app.services.streak_service import update_streak  # ← top pe add karo
 
 class VocabService:
 
@@ -119,6 +120,8 @@ class VocabService:
         # Word fetch for explanation
         word_result = await db.execute(select(VocabWord).where(VocabWord.id == data.word_id))
         word = word_result.scalar_one_or_none()
+
+        await update_streak(user_id=user_id, db=db)  # ← yahan
 
         return {
             "is_correct":    is_correct,
