@@ -2,7 +2,7 @@
 builder = "NIXPACKS"
 
 [deploy]
-startCommand = "PATH=/opt/venv/bin:$PATH uvicorn app.main:app --host 0.0.0.0 --port $PORT"
+startCommand = "bash -c 'source /root/.profile && uvicorn app.main:app --host 0.0.0.0 --port $PORT'"
 healthcheckPath = "/health"
 healthcheckTimeout = 30
 restartPolicyType = "ON_FAILURE"
