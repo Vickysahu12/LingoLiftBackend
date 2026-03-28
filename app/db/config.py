@@ -7,7 +7,7 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 10080
     GOOGLE_CLIENT_ID: str = ""
     GOOGLE_CLIENT_SECRET: str = ""
-    RESEND_API_KEY: str
+    RESEND_API_KEY: str = ""  # Optional — default empty string
     GMAIL_USER: str = ""
     GMAIL_PASSWORD: str = ""
 
