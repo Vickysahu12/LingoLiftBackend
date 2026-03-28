@@ -12,13 +12,12 @@ class Settings(BaseSettings):
     GMAIL_PASSWORD: str = ""
 
     def model_post_init(self, __context):
-        # Railway "postgres://" deta hai, asyncpg ko "postgresql+asyncpg://" chahiye
-        if self.DATABASE_URL.startswith("postgres://"):
-            object.__setattr__(
-                self,
-                "DATABASE_URL",
-                self.DATABASE_URL.replace("postgres://", "postgresql+asyncpg://", 1)
-            )
+        url = self.DATABASE_URL
+        if url.startswith("postgres://"):
+            url = url.replace("postgres://", "postgresql+asyncpg://", 1)
+        elif url.startswith("postgresql://"):
+            url = url.replace("postgresql://", "postgresql+asyncpg://", 1)
+        object.__setattr__(self, "DATABASE_URL", url)
 
     class Config:
         env_file = ".env"
