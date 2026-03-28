@@ -1,11 +1,9 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
-from fastapi import HTTPException, status
+from fastapi import HTTPException
 from datetime import datetime, timedelta, timezone
 import random
-import aiosmtplib
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
+import resend
 from app.account.models import User
 from app.schemas.auth import RegisterRequest, LoginRequest, VerifyOTPRequest, ResendOTPRequest
 from app.db.security import hash_password, verify_password, create_access_token
@@ -17,25 +15,18 @@ class AuthService:
         return str(random.randint(100000, 999999))
 
     async def send_otp_email(self, email: str, otp: str, name: str):
-        message = MIMEMultipart("alternative")
-        message["Subject"] = "Your LingoLift OTP Code"
-        message["From"] = settings.GMAIL_USER
-        message["To"] = email
-        message.attach(MIMEText(f"""
-            <h2>Hello {name}!</h2>
-            <p>Your OTP for LingoLift verification is:</p>
-            <h1 style="color:#1F3B1F; letter-spacing:8px;">{otp}</h1>
-            <p>Valid for <b>10 minutes</b>.</p>
-        """, "html"))
-
-        await aiosmtplib.send(
-            message,
-            hostname="smtp.gmail.com",
-            port=587,
-            username=settings.GMAIL_USER,
-            password=settings.GMAIL_PASSWORD,
-            start_tls=True,
-        )
+        resend.api_key = settings.RESEND_API_KEY
+        resend.Emails.send({
+            "from": "onboarding@resend.dev",
+            "to": email,
+            "subject": "Your LingoLift OTP Code",
+            "html": f"""
+                <h2>Hello {name}!</h2>
+                <p>Your OTP for LingoLift verification is:</p>
+                <h1 style="color:#1F3B1F; letter-spacing:8px;">{otp}</h1>
+                <p>Valid for <b>10 minutes</b>.</p>
+            """
+        })
 
     async def register(self, data: RegisterRequest, db: AsyncSession):
         result = await db.execute(select(User).where(User.email == data.email))
