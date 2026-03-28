@@ -110,4 +110,6 @@ class AuthService:
         token = create_access_token({"sub": str(user.id)})
         return token, user
 
+        
+
 auth_service = AuthService()
