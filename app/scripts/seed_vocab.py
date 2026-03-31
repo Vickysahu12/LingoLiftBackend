@@ -102,6 +102,19 @@ WORDS = [
         "tip": "Extremely common in CAT RC passages related to economics, governance, and policy.",
         "order_index": 7
     },
+    {
+    "word": "Loquacious",
+    "phonetic": "/ləˈkweɪʃəs/",
+    "tag": "HIGH FREQUENCY",
+    "definition": "Tending to talk a great deal; garrulous.",
+    "synonyms": ["Talkative", "Verbose", "Garrulous"],
+    "antonyms": ["Silent", "Reserved", "Taciturn"],
+    "context": "The loquacious minister often went off-script during press briefings.",
+    "source": "THE HINDU",
+    "article_url": "https://www.thehindu.com",
+    "tip": "Used in passages describing communication styles or political figures.",
+    "order_index": 8  # ← increment karo
+},
 ]
 
 async def seed():
