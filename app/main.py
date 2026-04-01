@@ -38,6 +38,6 @@ async def startup():
     async with engine.begin() as conn:
         print("✅ Database connected successfully!")
 
-@app.get("/health")
+@app.api_route("/health", methods=["GET", "HEAD"])
 async def health_check():
     return {"status": "ok", "message": "LingoLift API is running!"}

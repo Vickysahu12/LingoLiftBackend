@@ -106,14 +106,27 @@ WORDS = [
     "word": "Loquacious",
     "phonetic": "/ləˈkweɪʃəs/",
     "tag": "HIGH FREQUENCY",
-    "definition": "Tending to talk a great deal; garrulous.",
+    "definition": "Tending to talk a great deal; talkative.",
     "synonyms": ["Talkative", "Verbose", "Garrulous"],
     "antonyms": ["Silent", "Reserved", "Taciturn"],
-    "context": "The loquacious minister often went off-script during press briefings.",
+    "context": "The loquacious minister often went off-script during press briefings, frustrating his advisors.",
     "source": "THE HINDU",
     "article_url": "https://www.thehindu.com",
     "tip": "Used in passages describing communication styles or political figures.",
-    "order_index": 8  # ← increment karo
+    "order_index": 8
+},
+{
+    "word": "Sycophant",
+    "phonetic": "/ˈsɪkəfənt/",
+    "tag": "HIGH FREQUENCY",
+    "definition": "A person who acts obsequiously towards someone in order to gain advantage.",
+    "synonyms": ["Flatterer", "Yes-man", "Fawner"],
+    "antonyms": ["Critic", "Detractor", "Opponent"],
+    "context": "Surrounded by sycophants, the CEO rarely received honest feedback about the company's failures.",
+    "source": "THE ECONOMIST",
+    "article_url": "https://www.economist.com",
+    "tip": "Common in CAT RC passages on leadership, politics, and organizational behavior.",
+    "order_index": 9
 },
 ]
 
