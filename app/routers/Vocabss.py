@@ -9,7 +9,6 @@ import uuid
 
 router = APIRouter(prefix="/vocab", tags=["Vocabulary"])
 
-# ─── User Routes ──────────────────────────────────────────
 @router.get("/words")
 async def get_words(
     current_user: User = Depends(get_current_user),
