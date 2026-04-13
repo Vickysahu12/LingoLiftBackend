@@ -12,6 +12,7 @@ class VocabWord(Base):
     word          = Column(String(100), nullable=False, unique=True)
     phonetic      = Column(String(100), nullable=True)
     definition    = Column(Text, nullable=False)
+    difficulty    = Column(String(20), default='MEDIUM')   # ← yeh add karo
     synonyms      = Column(JSON, default=[])      # ["word1", "word2"]
     antonyms      = Column(JSON, default=[])      # ["word1", "word2"]
     context       = Column(Text, nullable=True)   # editorial context
