@@ -54,3 +54,11 @@ async def add_word(
     db: AsyncSession = Depends(get_db)
 ):
     return await vocab_service.add_word(data, db)
+
+@router.delete("/admin/words/{word_id}", dependencies=[Depends(get_admin_user)])
+async def delete_word(word_id: uuid.UUID, db: AsyncSession = Depends(get_db)):
+    return await vocab_service.delete_word(word_id, db)
+
+@router.put("/admin/words/{word_id}", dependencies=[Depends(get_admin_user)])
+async def update_word(word_id: uuid.UUID, data: VocabWordCreate, db: AsyncSession = Depends(get_db)):
+    return await vocab_service.update_word(word_id, data, db)
