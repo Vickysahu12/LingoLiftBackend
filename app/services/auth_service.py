@@ -74,7 +74,7 @@ class AuthService:
         user.otp_expires_at = None
         await db.flush()
 
-        token = create_access_token({"sub": str(user.id)})
+        token = create_access_token({"sub": str(user.id), "email": user.email, "name": user.name})
         return token, user
 
     async def resend_otp(self, data: ResendOTPRequest, db: AsyncSession):
@@ -107,7 +107,7 @@ class AuthService:
         if not user.is_verified:
             raise HTTPException(status_code=403, detail="Email not verified. Please verify your email first.")
 
-        token = create_access_token({"sub": str(user.id)})
+        token = create_access_token({"sub": str(user.id), "email": user.email, "name": user.name})
         return token, user
 
         
