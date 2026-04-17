@@ -51,3 +51,7 @@ async def add_passage(
     db: AsyncSession = Depends(get_db)
 ):
     return await rc_service.add_passage(data, db)
+
+@router.get("/admin/passages", dependencies=[Depends(get_admin_user)])
+async def get_admin_passages(db: AsyncSession = Depends(get_db)):
+    return await rc_service.get_admin_passages(db)

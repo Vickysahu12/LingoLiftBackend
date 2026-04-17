@@ -207,6 +207,33 @@ class RCService:
             "time_taken": data.time_taken,
             "total":      total
         }
+    async def get_admin_passages(self, db: AsyncSession):
+        result = await db.execute(
+            select(RCPassage)
+            .where(RCPassage.is_active == True)
+            .order_by(RCPassage.order_index)
+        )
+        passages = result.scalars().all()
+
+        response = []
+        for p in passages:
+            q_count_result = await db.execute(
+                select(func.count(RCQuestion.id)).where(RCQuestion.passage_id == p.id)
+            )
+            q_count    = q_count_result.scalar() or 0
+            word_count = len(p.body.split()) if p.body else 0
+
+            response.append({
+                "id":             str(p.id),
+                "title":          p.title,
+                "subject":        p.subject or "",
+                "difficulty":     p.difficulty,
+                "source":         p.source or "",
+                "word_count":     word_count,
+                "question_count": q_count,
+            })
+
+        return response
 
     async def add_passage(self, data: RCPassageCreate, db: AsyncSession):
         passage = RCPassage(
@@ -242,5 +269,6 @@ class RCService:
 
         await db.flush()
         return {"message": "Passage added successfully", "id": str(passage.id)}
+    
 
 rc_service = RCService()
