@@ -268,6 +268,7 @@ class RCService:
                 db.add(option)
 
         await db.flush()
+        await db.commit()
         return {"message": "Passage added successfully", "id": str(passage.id)}
     
 
