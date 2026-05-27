@@ -12,12 +12,13 @@ class RCOptionResponse(BaseModel):
 
 
 class RCQuestionResponse(BaseModel):
-    id:          uuid.UUID
-    question:    str
-    difficulty:  str
-    analysis:    Optional[str] = None
-    order_index: int
-    options:     List[RCOptionResponse] = []
+    id:            uuid.UUID
+    question:      str
+    difficulty:    str
+    analysis:      Optional[str] = None
+    order_index:   int
+    correct_index: int = 0        # ← yeh add karo
+    options:       List[RCOptionResponse] = []
     model_config = {"from_attributes": True}
 
 
